@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Build a Yurt</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 0;
+        overflow: hidden;
+      }
+      .fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: black;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .fullscreen img {
+        max-width: 80vw;
+        max-height: 80vh;
+      }
+      .game-container {
+        display: none;
+      }
+      .container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+      .parts {
+        width: 250px;
+        min-height: 400px;
+        border: 2px dashed #333;
+        padding: 10px;
+        margin: 10px;
+      }
+      .yurt {
+        width: 300px;
+        height: 400px;
+        position: relative;
+        border: 2px solid #333;
+        padding: 10px;
+        margin: 10px;
+        background: lightgray;
+      }
+      .part {
+        padding: 10px;
+        background: lightblue;
+        margin: 5px;
+        cursor: grab;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .part img {
+        width: 100px;
+        height: auto;
+      }
+      .placed {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="fullscreen" id="intro">
+      <img id="intro-image" src="images/image1.png" alt="Intro Image" />
+      <button onclick="nextImage()">Next</button>
+    </div>
+
+    <div class="game-container" id="game">
+      <h2>Drag and Drop to Build a Yurt</h2>
+      <p>Arrange the parts in the correct order to complete the yurt</p>
+      <div class="container">
+        <div class="parts" id="parts"></div>
+        <div class="yurt" id="yurt"></div>
+      </div>
+      <p id="result"></p>
+    </div>
+
+    <script>
+      let introImages = [
+        'images/image1.png',
+        'images/image2.png',
+        'images/image3.png',
+        'images/image4.png',
+        'images/image5.png'
+      ]
+      let currentImageIndex = 0
+      let introScreen = document.getElementById('intro')
+      let gameScreen = document.getElementById('game')
+      let introImage = document.getElementById('intro-image')
+
+      function nextImage() {
+        currentImageIndex++
+        if (currentImageIndex < introImages.length) {
+          introImage.src = introImages[currentImageIndex]
+        } else {
+          introScreen.style.display = 'none'
+          gameScreen.style.display = 'block'
+        }
+      }
+
+      let yurt = document.getElementById('yurt')
+      let partsContainer = document.getElementById('parts')
+      let correctOrder = [
+        'base',
+        'door',
+        'wall-section',
+        'zone',
+        'skylight',
+        'uni',
+        'wall',
+        'felt-roof-cover',
+        'skylight-cover',
+        'felt-roof-line',
+        'rim'
+      ]
+      let currentIndex = 0
+
+      let shuffledOrder = [...correctOrder].sort(() => Math.random() - 0.5)
+
+      shuffledOrder.forEach((id) => {
+        let part = document.createElement('div')
+        part.classList.add('part')
+        part.id = id
+        part.draggable = true
+        part.innerHTML = `<img src=""images/${id}.png"" alt="${id}">`
+        partsContainer.appendChild(part)
+
+        part.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text', e.target.id)
+        })
+      })
+
+      yurt.addEventListener('dragover', (e) => {
+        e.preventDefault()
+      })
+
+      yurt.addEventListener('drop', (e) => {
+        e.preventDefault()
+        let id = e.dataTransfer.getData('text')
+        let element = document.getElementById(id)
+
+        if (id === correctOrder[currentIndex]) {
+          let placedElement = document.createElement('img')
+          placedElement.src = `"images/${id}.png"`
+          placedElement.alt = id
+          placedElement.classList.add('placed')
+          placedElement.style.top = `${currentIndex * 35}px`
+          yurt.appendChild(placedElement)
+          element.remove()
+          currentIndex++
+          if (currentIndex === correctOrder.length) {
+            document.getElementById('result').innerText =
+              'Congratulations! You built the yurt correctly!'
+          }
+        } else {
+          document.getElementById('result').innerText =
+            'Incorrect part. Try again!'
+        }
+      })
+    </script>
+  </body>
+</html>
