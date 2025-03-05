@@ -69,12 +69,23 @@
         left: 50%;
         transform: translateX(-50%);
       }
+      #back-btn {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #333;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
     <div class="fullscreen" id="intro">
       <img id="intro-image" src="images/image1.png" alt="Intro Image" />
       <button onclick="nextImage()">Next</button>
+      <button id="back-btn" style="display: none" onclick="goBack()">
+        Back
+      </button>
     </div>
 
     <div class="game-container" id="game">
@@ -107,7 +118,14 @@
         } else {
           introScreen.style.display = 'none'
           gameScreen.style.display = 'block'
+          document.getElementById('back-btn').style.display = 'block'
         }
+      }
+
+      function goBack() {
+        gameScreen.style.display = 'none'
+        introScreen.style.display = 'block'
+        document.getElementById('back-btn').style.display = 'none'
       }
 
       let yurt = document.getElementById('yurt')
@@ -134,7 +152,7 @@
         part.classList.add('part')
         part.id = id
         part.draggable = true
-        part.innerHTML = `<img src=""images/${id}.png"" alt="${id}">`
+        part.innerHTML = `<img src="images/${id}.png" alt="${id}">`
         partsContainer.appendChild(part)
 
         part.addEventListener('dragstart', (e) => {
@@ -153,13 +171,16 @@
 
         if (id === correctOrder[currentIndex]) {
           let placedElement = document.createElement('img')
-          placedElement.src = `"images/${id}.png"`
+          placedElement.src = `images/${id}.png`
           placedElement.alt = id
           placedElement.classList.add('placed')
           placedElement.style.top = `${currentIndex * 35}px`
           yurt.appendChild(placedElement)
-          element.remove()
+
+          // Hide the original element after it has been dropped
+          element.style.display = 'none'
           currentIndex++
+
           if (currentIndex === correctOrder.length) {
             document.getElementById('result').innerText =
               'Congratulations! You built the yurt correctly!'
